@@ -2,6 +2,7 @@
 using AppUni.Entidades;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppUni.WEB.MVC.Controllers
@@ -9,9 +10,18 @@ namespace AppUni.WEB.MVC.Controllers
     public class CarrerasController : Controller
     {
         private readonly string urlApi;
+        private string urlBase;
+
         public CarrerasController(IConfiguration configuration)
         {
             urlApi = configuration.GetValue("ApiUrlBase", "").ToString() + "/Carreras";
+            this.urlBase = configuration.GetValue("ApiUrlBase", "").ToString();
+
+        }
+        private Universidad[] ObtenerListaDepartamentos()
+        {
+
+            return Crud<Universidad>.Read(urlBase + "/Universidades");
         }
         // GET: CarrerasController
         public ActionResult Index()
@@ -30,6 +40,11 @@ namespace AppUni.WEB.MVC.Controllers
         // GET: CarrerasController/Create
         public ActionResult Create()
         {
+            ViewBag.UniversidadId = ObtenerListaDepartamentos().Select(d => new SelectListItem
+            {
+                Value = d.Id.ToString(),
+                Text = d.Nombre
+            }).ToList();
             return View();
         }
 
